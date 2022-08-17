@@ -1,0 +1,11 @@
+asgiref==3.3.1
+Django==3.1.4
+gunicorn==20.0.4
+Pillow
+pytz==2021.1
+PyJWT==2.1.0
+sqlparse==0.4.1
+psycopg2-binary==2.8.6
+django-filter==2.4.0
+djangorestframework==3.12.4
+djoser

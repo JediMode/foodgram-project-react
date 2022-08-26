@@ -1,9 +1,11 @@
+from api.paginators import CustomPagination
 from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
 from users.models import CustomUser, Follow
 from users.serializers import SubscribeSerializer, SubscriptionSerializer
 
@@ -13,18 +15,26 @@ STATUS_EMPTY = status.HTTP_204_NO_CONTENT
 
 class CustomUserViewSet(UserViewSet):
     queryset = CustomUser.objects.all()
+    pagination_class = CustomPagination
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         user = get_object_or_404(
             CustomUser, id=request.user.id,
         )
-        queryset = Follow.objects.filter(user=user)
+        queryset = CustomUser.objects.filter(following__user=user)
         pages = self.paginate_queryset(queryset)
+        if pages is not None:
+            serializer = SubscriptionSerializer(
+                pages,
+                many=True,
+                context={'request': request},
+            )
+            return self.get_paginated_response(serializer.data)
         serializer = SubscriptionSerializer(
-            pages,
+            queryset,
             many=True,
-            context={'request': request},
+            context={'request': request}
         )
         return Response(serializer.data)
 
@@ -40,15 +50,10 @@ class CustomUserViewSet(UserViewSet):
                 data=data,
                 context={'request': request},
             )
-            serializer.is_valid(raise_exeption=True)
+            serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=STATUS_CREATED)
-        else:
-            following = get_object_or_404(
-                CustomUser, id=id,
-                )
-            follow = get_object_or_404(
-                Follow, user=user, author=following,
-            )
-            follow.delete()
-            return Response(status=STATUS_EMPTY)
+        following = get_object_or_404(CustomUser, id=id,)
+        follow = get_object_or_404(Follow, user=user, author=following,)
+        follow.delete()
+        return Response(status=STATUS_EMPTY)

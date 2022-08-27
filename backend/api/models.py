@@ -6,13 +6,18 @@ from api.validators import validate_greater_than_zero
 
 
 class Ingredient(models.Model):
-    name = models.CharField('Название', max_length=200, unique=True)
+    name = models.CharField('Название', max_length=200)
     measurement_unit = models.CharField('Единица измерения', max_length=200)
 
     class Meta:
         ordering = ('-id',)
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'measurement_unit'],
+                name='unique_ingredient')
+        ]
 
     def __str__(self):
         return f'{self.name} ({self.measurement_unit})'
@@ -95,13 +100,8 @@ class RecipeIngredient(models.Model):
         verbose_name_plural = 'Количество ингредиентов'
         constraints = [
             models.UniqueConstraint(
-                fields=['ingredient', 'amount'],
-                name='unique_ingredient_amount',
-            ),
-            models.UniqueConstraint(
                 fields=['ingredient', 'recipe'],
-                name='unique_ingredients'
-            ),
+                name='unique_recipe_ingredients')
         ]
 
     def __str__(self):

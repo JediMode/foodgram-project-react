@@ -10,7 +10,7 @@ class Ingredient(models.Model):
     measurement_unit = models.CharField('Единица измерения', max_length=200)
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('name',)
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
         constraints = [

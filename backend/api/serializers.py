@@ -82,7 +82,7 @@ class IngredientWriteSerializer(serializers.ModelSerializer):
 class RecipeWriteSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True)
-    ingredients = IngredientWriteSerializer()
+    ingredients = IngredientWriteSerializer(many=True)
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField()
 
@@ -92,7 +92,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                   'text', 'cooking_time')
 
     def validate(self, data):
-        ingredients = data['ingredients']
+        ingredients = self.initial_data.get('ingredients')
         ingredients_list = []
         for ingredient in ingredients:
             ingredient_id = ingredient['id']
@@ -107,7 +107,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                     'amount': 'Количество ингредиента должно быть больше нуля'
                 })
 
-        tags = data['tags']
+        tags = self.initial_data.get('tags')
         if not tags:
             raise serializers.ValidationError({
                 'tags': 'Нужно выбрать хотя бы один тэг'
@@ -128,12 +128,16 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return data
 
     def create_ingredients(self, ingredients, recipe):
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(
-                recipe=recipe,
-                ingredient=ingredient['id'],
-                amount=ingredient['amount'],
-            )
+        RecipeIngredient.objects.bulk_create(
+            [
+                RecipeIngredient(
+                    recipe=recipe,
+                    ingredient=ingredient['id'],
+                    amount=ingredient['amount']
+                )
+                for ingredient in ingredients
+            ]
+        )
 
     def create_tags(self, tags, recipe):
         recipe.tags.set(tags)

@@ -1,6 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -108,13 +110,15 @@ class RecipeViewSet(ModelViewSet):
                 }
             else:
                 final_list[name]['amount'] += item[2]
+        pdfmetrics.registerFont(
+            TTFont('DejaVuSans', './data/DejaVuSans.ttf', 'UTF-8'))
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = ('attachment; '
                                            'filename="shopping_list.pdf"')
         page = canvas.Canvas(response)
-        page.setFont('Courier', size=24)
+        page.setFont('DejaVuSans', size=24)
         page.drawString(200, 800, 'Список покупок')
-        page.setFont('Courier', size=16)
+        page.setFont('DejaVuSans', size=16)
         height = 750
         for i, (name, data) in enumerate(final_list.items(), 1):
             page.drawString(75, height, (f'{data["recipe"]}:'

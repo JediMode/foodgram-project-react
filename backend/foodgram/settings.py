@@ -8,7 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='testkey')
 
-DEBUG = False
+DEBUG = True
 
 
 ALLOWED_HOSTS = ['*']
@@ -143,3 +143,10 @@ DJOSER = {
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 ADMIN_EMAIL = 'nikitapolayn@yandex.ru'
+
+# CONSTANTS
+MIN_AMOUNT_VALUE = 1
+MAX_AMOUNT_VALUE = 1000
+LOW_LIMIT_TIME_VALUE = 1
+UP_LIMIT_TIME_VALUE = 360
+OBJECTS_PER_PAGE = 6

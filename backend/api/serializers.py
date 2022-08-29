@@ -1,4 +1,6 @@
 from drf_extra_fields.fields import Base64ImageField
+from foodgram.settings import (LOW_LIMIT_TIME_VALUE, MAX_AMOUNT_VALUE,
+                               MIN_AMOUNT_VALUE, UP_LIMIT_TIME_VALUE)
 from rest_framework import serializers
 from users.serializers import CustomUserSerializer
 
@@ -72,12 +74,6 @@ class IngredientWriteSerializer(serializers.ModelSerializer):
         model = RecipeIngredient
         fields = ('id', 'amount')
 
-    def validate_amount(self, value):
-        if value <= 0:
-            raise serializers.ValidationError(
-                'Количество ингредиента строго положительное и больше нуля')
-        return value
-
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
@@ -92,7 +88,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                   'text', 'cooking_time')
 
     def validate(self, data):
-        ingredients = self.initial_data.get('ingredients')
+        ingredients = data('ingredients')
         ingredients_list = []
         for ingredient in ingredients:
             ingredient_id = ingredient['id']
@@ -102,15 +98,19 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 })
             ingredients_list.append(ingredient_id)
             amount = ingredient['amount']
-            if int(amount) <= 0:
+            if int(amount) <= MIN_AMOUNT_VALUE:
                 raise serializers.ValidationError({
-                    'amount': 'Количество ингредиента должно быть больше нуля'
+                    'amount': 'Количество ингредиента должно быть больше 1'
+                })
+            elif int(amount) > MAX_AMOUNT_VALUE:
+                raise serializers.ValidationError({
+                    'amount': 'Максимальное количество ингредиента 1000 единиц'
                 })
 
-        tags = self.initial_data.get('tags')
+        tags = data['tags']
         if not tags:
             raise serializers.ValidationError({
-                'tags': 'Нужно выбрать хотя бы один тэг'
+                'tags': 'Выберите тэг'
             })
         tags_list = []
         for tag in tags:
@@ -121,9 +121,13 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             tags_list.append(tag)
 
         cooking_time = data['cooking_time']
-        if int(cooking_time) <= 0:
+        if int(cooking_time) <= LOW_LIMIT_TIME_VALUE:
             raise serializers.ValidationError({
-                'cooking_time': 'Время приготовления должно быть больше 0'
+                'cooking_time': 'Время приготовления должно быть больше 1'
+            })
+        elif int(cooking_time) > UP_LIMIT_TIME_VALUE:
+            raise serializers.ValidationError({
+                'cooking_time': 'Максимальное время приготовления - 360 минут'
             })
         return data
 

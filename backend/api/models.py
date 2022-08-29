@@ -1,8 +1,8 @@
 from colorfield.fields import ColorField
+from django.core.validators import MinValueValidator
 from django.db import models
+from foodgram.settings import LOW_LIMIT_TIME_VALUE, MIN_AMOUNT_VALUE
 from users.models import CustomUser
-
-from api.validators import validate_greater_than_zero
 
 
 class Ingredient(models.Model):
@@ -57,9 +57,11 @@ class Recipe(models.Model):
         Tag,
         verbose_name='Теги',
     )
-    cooking_time = models.FloatField(
+    cooking_time = models.PositiveIntegerField(
         'Время приготовления (в минутах)',
-        validators=[validate_greater_than_zero]
+        validators=(
+            MinValueValidator(LOW_LIMIT_TIME_VALUE,
+                              message='Время должно быть больше 1 минуты'),),
     )
     author = models.ForeignKey(
         CustomUser,
@@ -90,9 +92,11 @@ class RecipeIngredient(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Ингредиент',
     )
-    amount = models.FloatField(
+    amount = models.PositiveIntegerField(
         'Количество',
-        validators=[validate_greater_than_zero],
+        validators=(
+            MinValueValidator(MIN_AMOUNT_VALUE,
+                              message='Количество не может быть меньше 1'),),
     )
 
     class Meta:

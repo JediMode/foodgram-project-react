@@ -90,3 +90,11 @@ sudo docker-compose up -d --build
 
 ## Проект в интернете
 Проект запущен и доступен по адресу (http://158.160.7.15/recipes)
+
+## Данные для ревью
+```
+ADDRES: http://158.160.7.15/recipes
+ADMIN: nikitapolayn@yandex.ru --- password: adminpass
+TEST_USER_1: ivan@mail.ru --- password: ivan12345
+TEST_USER_2: cap_sarrow@mail.ru --- password: sparr00w123
+```

@@ -88,7 +88,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                   'text', 'cooking_time')
 
     def validate(self, data):
-        ingredients = data('ingredients')
+        ingredients = data['ingredients']
         ingredients_list = []
         for ingredient in ingredients:
             ingredient_id = ingredient['id']
@@ -131,6 +131,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             })
         return data
 
+    @staticmethod
     def create_ingredients(self, ingredients, recipe):
         RecipeIngredient.objects.bulk_create(
             [
@@ -143,6 +144,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             ]
         )
 
+    @staticmethod
     def create_tags(self, tags, recipe):
         recipe.tags.set(tags)
 

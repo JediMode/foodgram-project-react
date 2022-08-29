@@ -131,7 +131,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             })
         return data
 
-    @staticmethod
     def create_ingredients(self, ingredients, recipe):
         RecipeIngredient.objects.bulk_create(
             [
@@ -144,7 +143,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             ]
         )
 
-    @staticmethod
     def create_tags(self, tags, recipe):
         recipe.tags.set(tags)
 

@@ -1,3 +1,5 @@
+![example workflow](https://github.com/JediMode/foodgram-project-react/actions/workflows/main.yml/badge.svg)
+
 # Foodgram 
 
 Проект Foodgram реализован для обмена рецептами. Авторизованные пользователи

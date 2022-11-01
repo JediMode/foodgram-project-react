@@ -87,6 +87,3 @@ sudo docker-compose up -d --build
     sudo docker-compose exec web python manage.py createsuperuser
     ```
     - Проект будет доступен по вашему IP
-
-## Проект в интернете
-Проект запущен и доступен по адресу (http://158.160.7.15/recipes)
